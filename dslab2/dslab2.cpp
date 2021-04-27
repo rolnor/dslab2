@@ -169,6 +169,7 @@ void myTable::repartition(int hashLocation)
     bool algCompleted = false;
     int newHashLocation = hashLocation;
     int trailingHashLocation;
+    int i = 0;
 
     while(!algCompleted)
     {
@@ -180,11 +181,13 @@ void myTable::repartition(int hashLocation)
             trailingHashLocation = tableSize - 1;
         else trailingHashLocation = newHashLocation-1;
 
+        // move data up one slot
         if (hashLocation == calculateHash(data[newHashLocation], tableSize))
         {
             data[trailingHashLocation] = data[newHashLocation];
             data[newHashLocation] = "";
         }
+        // stop if empty slot or correct hash
         else if(newHashLocation == calculateHash(data[newHashLocation], tableSize) || data[newHashLocation] == "")
             algCompleted = true;
     }
