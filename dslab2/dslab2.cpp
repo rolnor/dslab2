@@ -5,10 +5,10 @@
 
 
 using namespace std;
-void menu();
 
 // helper functions
 void getLine(string& inputString);
+void menu();
 
 // global variables
 const int tableSize = 10;
@@ -20,6 +20,8 @@ private:
 public:
     void insert(string& inputData,int hashLocation);
     void search(string& inputData, int hashLocation);
+    void remove(string& inputData, int hashLocation);
+    void repartition(int hashLocation);
     int calculateHash(const string& key, int tableSize);
     void print();
 };
@@ -45,6 +47,11 @@ int main()
                 getLine(inputString);
                 linearTable.search(inputString, linearTable.calculateHash(inputString, tableSize));
                 break;
+            case '3':
+                cout << endl << "Remove: ";
+                getLine(inputString);
+                linearTable.remove(inputString, linearTable.calculateHash(inputString, tableSize));
+                break;
             case '4':
                 linearTable.print();
                 break;
@@ -59,6 +66,7 @@ void menu()
 {
     cout << "1. Insert" << endl;
     cout << "2. Search" << endl;
+    cout << "3. Remove" << endl;
     cout << "4. Print" << endl;
     cout << "0. Quit " << endl;
 }
@@ -130,6 +138,54 @@ void myTable::search(string& inputData, int hashLocation)
             cout << endl << "Key not found" << endl;
             break;
         }else i++;
+    }
+}
+
+void myTable::remove(string& inputData, int hashLocation)
+{
+    bool algCompleted = false;
+    int i = 0;
+
+    while (!algCompleted && i < tableSize-1)
+    {
+        if (data[hashLocation] == "")
+        {
+            algCompleted = true;
+        }
+        else if (data[hashLocation] == inputData)
+        {
+            data[hashLocation] = "";
+            repartition(hashLocation);
+        }
+        else if (hashLocation < tableSize - 1)
+            hashLocation += 1;
+        else
+            hashLocation = 0;
+    }
+}
+
+void myTable::repartition(int hashLocation)
+{
+    bool algCompleted = false;
+    int newHashLocation = hashLocation;
+    while(!algCompleted)
+    {
+        if (newHashLocation + 1 < tableSize - 1)
+            newHashLocation++;
+        else newHashLocation = 0;
+
+        if (hashLocation == calculateHash(data[newHashLocation], tableSize) && data[newHashLocation] != "")
+        {
+            data[hashLocation] = data[newHashLocation];
+            data[newHashLocation] = "";
+
+            if (hashLocation + 1 < tableSize - 1)
+                hashLocation++;
+            else hashLocation = 0;
+        }
+        else algCompleted = true;
+
+
     }
 }
 
