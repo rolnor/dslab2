@@ -168,24 +168,25 @@ void myTable::repartition(int hashLocation)
 {
     bool algCompleted = false;
     int newHashLocation = hashLocation;
+    int trailingHashLocation;
+
     while(!algCompleted)
     {
         if (newHashLocation + 1 < tableSize - 1)
             newHashLocation++;
         else newHashLocation = 0;
 
-        if (hashLocation == calculateHash(data[newHashLocation], tableSize) && data[newHashLocation] != "")
+        if (newHashLocation == 0)
+            trailingHashLocation = tableSize - 1;
+        else trailingHashLocation = newHashLocation-1;
+
+        if (hashLocation == calculateHash(data[newHashLocation], tableSize))
         {
-            data[hashLocation] = data[newHashLocation];
+            data[trailingHashLocation] = data[newHashLocation];
             data[newHashLocation] = "";
-
-            if (hashLocation + 1 < tableSize - 1)
-                hashLocation++;
-            else hashLocation = 0;
         }
-        else algCompleted = true;
-
-
+        else if(newHashLocation == calculateHash(data[newHashLocation], tableSize) || data[newHashLocation] == "")
+            algCompleted = true;
     }
 }
 
@@ -196,7 +197,7 @@ int myTable::calculateHash(const string& key, int tableSize)
 
     for (char myChar : key)
     {
-        hashValue = 37 * hashValue + myChar;
+        hashValue = 9;//37 * hashValue + myChar;
     }
     return hashValue % tableSize;
 }
