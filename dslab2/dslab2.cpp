@@ -21,7 +21,7 @@ public:
     void insert(string& inputData,int hashLocation);
     void search(string& inputData, int hashLocation);
     void remove(string& inputData, int hashLocation);
-    void repartition(int hashLocation);
+    void repartition(int trueHash, int newHashLocation);
     int calculateHash(const string& key, int tableSize);
     void print();
 };
@@ -144,30 +144,31 @@ void myTable::search(string& inputData, int hashLocation)
 void myTable::remove(string& inputData, int hashLocation)
 {
     bool algCompleted = false;
+    int traverser = hashLocation;
+
     int i = 0;
 
     while (!algCompleted && i < tableSize-1)
     {
-        if (data[hashLocation] == "")
+        if (data[traverser] == "")
         {
             algCompleted = true;
         }
-        else if (data[hashLocation] == inputData)
+        else if (data[traverser] == inputData)
         {
-            data[hashLocation] = "";
-            repartition(hashLocation);
+            data[traverser] = "";
+            repartition(hashLocation, traverser);
         }
-        else if (hashLocation < tableSize - 1)
-            hashLocation += 1;
+        else if (traverser < tableSize - 1)
+            traverser += 1;
         else
-            hashLocation = 0;
+            traverser = 0;
     }
 }
 
-void myTable::repartition(int hashLocation)
+void myTable::repartition(int trueHash, int newHashLocation)
 {
     bool algCompleted = false;
-    int newHashLocation = hashLocation;
     int trailingHashLocation;
     int i = 0;
 
@@ -182,7 +183,7 @@ void myTable::repartition(int hashLocation)
         else trailingHashLocation = newHashLocation-1;
 
         // move data up one slot
-        if (hashLocation == calculateHash(data[newHashLocation], tableSize))
+        if (trueHash == calculateHash(data[newHashLocation], tableSize))
         {
             data[trailingHashLocation] = data[newHashLocation];
             data[newHashLocation] = "";
