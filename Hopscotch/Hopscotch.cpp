@@ -23,9 +23,10 @@ public:
     myBucket();
     void insert(string& inputData, int hashLocation);
     void bitOp(string oP, int bucketPosition, int dataPosition);
+    vector<int> calculateBitLocation(int bitString);
     void search(string& inputData, int hashLocation);
     void remove(string& inputData, int hashLocation);
-//    void repartition(int trueHash, int newHashLocation);
+    void repartition(int trueHash, int newHashLocation);
     int calculateHash(const string& key, int bucketSize);
     void print();
 };
@@ -123,7 +124,10 @@ void myBucket::insert(string& inputData, int hashLocation)
         }
         else
         {
-            cout << endl << "Bucket is full" << endl;
+            cout << endl << "Bucket is full. Trying to restructure" << endl;
+            // 
+            // TODO call repartition here
+            //
             algCompleted = true;
         }
     }
@@ -154,6 +158,21 @@ void myBucket::bitOp(string oP, int bucketPosition, int dataPosition)
     // SUB eq (negative bucket pos) * pos | ex pos 2 = 0100. neg pos(~) = 1011 => resets 2nd bit with AND op.
     else if (oP == "SUB")
         hopBits[bucketPosition] = hopBits[bucketPosition] & ~dataPosition;
+}
+
+vector<int> myBucket::calculateBitLocation(int bitString)
+{
+    vector<int> indexes;
+    if (~bitString & 1)
+        indexes.push_back(0);
+    if (~bitString & 2)
+        indexes.push_back(1);
+    if (~bitString & 4)
+        indexes.push_back(2);
+    if (~bitString & 8)
+        indexes.push_back(3);
+
+    return indexes;
 }
 
 void myBucket::search(string& inputData, int hashLocation)
@@ -201,7 +220,9 @@ void myBucket::remove(string& inputData, int hashLocation)
                 cout << endl << "Key found and removed" << endl;
                 keyFound = true;
 
+                // empty bucket
                 bucket[hashLocation + i] = "";
+                // set represented buckets bit to 0 in main bucket.
                 bitOp("SUB", hashLocation, i);
             }
         }
@@ -210,34 +231,44 @@ void myBucket::remove(string& inputData, int hashLocation)
     }
 }
 
-//void myBucket::repartition(int trueHash, int newHashLocation)
-//{
-//    bool algCompleted = false;
-//    int trailingHashLocation;
-//    int i = 0;
-//
-//    while (!algCompleted)
-//    {
-//        if (newHashLocation + 1 < tableSize - 1)
-//            newHashLocation++;
-//        else newHashLocation = 0;
-//
-//        if (newHashLocation == 0)
-//            trailingHashLocation = tableSize - 1;
-//        else trailingHashLocation = newHashLocation - 1;
-//
-//        // move data up one slot
-//        if (trueHash == calculateHash(data[newHashLocation], tableSize))
-//        {
-//            data[trailingHashLocation] = data[newHashLocation];
-//            data[newHashLocation] = "";
-//        }
-//        // stop if empty slot or correct hash
-//        else if (newHashLocation == calculateHash(data[newHashLocation], tableSize) || data[newHashLocation] == "")
-//            algCompleted = true;
-//    }
-//}
-//
+// inputs are trueHash: location that has bitinfo. & currentLocation is bucket pos
+void myBucket::repartition(int trueHash, int currentLocation)
+{ 
+    // 5. insert in created free slot.
+
+    // find first buckets bit sequence. are there any 0:os ie less than 15?
+    bool succededMove = false;
+    int currentIndex, moveToIndex, itemHomeHash;
+
+    if (hopBits[trueHash] < 15)
+    {
+        vector<int> searchIndex = calculateBitLocation(hopBits[trueHash]); 
+        while (!searchIndex.empty() && !succededMove)
+        {
+            currentIndex = searchIndex.back();
+            searchIndex.pop_back();
+            // check hash of that entry
+            itemHomeHash = calculateHash(bucket[trueHash + currentIndex], bucketSize);
+            // check bits of that hash index. any free slots?
+            if (hopBits[itemHomeHash] < 15)
+            {
+                // if so move to free slot and update bits.
+                searchIndex.clear();
+                searchIndex = calculateBitLocation(hopBits[itemHomeHash]);
+                moveToIndex = itemHomeHash + searchIndex.back();
+
+                bucket[moveToIndex] = bucket[trueHash + currentIndex];
+                bitOp("ADD", itemHomeHash, currentIndex);
+
+                bucket[trueHash + currentIndex] = "";
+                bitOp("SUB", trueHash, currentIndex);
+            }
+            else cout << endl << "All values has a correct hash sequence. Resize needed." << endl;
+        }
+    }
+    else cout << endl << "All values has a correct hash sequence. Resize needed." << endl;
+}
+
 int myBucket::calculateHash(const string& key, int tableSize)
 {
     // unsigned to avoid negative number
