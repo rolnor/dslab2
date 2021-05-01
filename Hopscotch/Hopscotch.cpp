@@ -21,12 +21,19 @@ private:
     unsigned char hopBits[bucketSize];
 public:
     myBucket();
+    // inserts data into bucket
     void insert(string& inputData, int hashLocation);
+    // update bit operations. supports ADD, OR and SUB
     void bitOp(string oP, int bucketPosition, int dataPosition);
+    // calculates index list from bits
     vector<int> calculateBitLocation(int bitString);
+    // search for input key in the specified hashlocation
     void search(string& inputData, int hashLocation);
+    // remove key and update bit information
     void remove(string& inputData, int hashLocation);
-    void repartition(int trueHash, int newHashLocation);
+    // try to move items to adjacent buckets and updates bitstring. returns true if op successful.
+    bool repartition(int trueHash);
+    // calculates hash index of specified key
     int calculateHash(const string& key, int bucketSize);
     void print();
 };
@@ -58,7 +65,10 @@ int main()
             hopBucket.remove(inputString, hopBucket.calculateHash(inputString, bucketSize));
               break;
         case '4':
-              hopBucket.print();
+            hopBucket.print();
+            break;
+        case '5':
+            hopBucket.repartition(5);
             break;
         case '0':
             break;
@@ -127,8 +137,15 @@ void myBucket::insert(string& inputData, int hashLocation)
             cout << endl << "Bucket is full. Trying to restructure" << endl;
             // 
             // TODO call repartition here
-            //
-            algCompleted = true;
+            // might be done???! 
+            if (repartition(traverserHashLocation))
+            {
+                traverserHashLocation = 0;
+            }
+            else
+            {
+                algCompleted = true;
+            }
         }
     }
 }
@@ -232,10 +249,8 @@ void myBucket::remove(string& inputData, int hashLocation)
 }
 
 // inputs are trueHash: location that has bitinfo. & currentLocation is bucket pos
-void myBucket::repartition(int trueHash, int currentLocation)
+bool myBucket::repartition(int trueHash)
 { 
-    // 5. insert in created free slot.
-
     // find first buckets bit sequence. are there any 0:os ie less than 15?
     bool succededMove = false;
     int currentIndex, moveToIndex, itemHomeHash;
@@ -256,17 +271,17 @@ void myBucket::repartition(int trueHash, int currentLocation)
                 searchIndex.clear();
                 searchIndex = calculateBitLocation(hopBits[itemHomeHash]);
                 moveToIndex = itemHomeHash + searchIndex.back();
-
+  
                 bucket[moveToIndex] = bucket[trueHash + currentIndex];
                 bitOp("ADD", itemHomeHash, currentIndex);
 
                 bucket[trueHash + currentIndex] = "";
                 bitOp("SUB", trueHash, currentIndex);
+                succededMove = true;
             }
-            else cout << endl << "All values has a correct hash sequence. Resize needed." << endl;
         }
     }
-    else cout << endl << "All values has a correct hash sequence. Resize needed." << endl;
+    return succededMove;
 }
 
 int myBucket::calculateHash(const string& key, int tableSize)
