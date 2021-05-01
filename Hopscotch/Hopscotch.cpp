@@ -94,8 +94,8 @@ myBucket::myBucket()
 void myBucket::insert(string& inputData, int hashLocation)
 {
     bool algCompleted = false;
-    int i = 0;
     int traverserHashLocation = hashLocation;
+    int bucketPosition = 0;
 
     while (!algCompleted)
     {
@@ -106,25 +106,26 @@ void myBucket::insert(string& inputData, int hashLocation)
             if(traverserHashLocation != hashLocation)
                 this->bitOp("OR", traverserHashLocation, -1);
 
-            this->bitOp("OR", hashLocation, i);
+            this->bitOp("OR", hashLocation, bucketPosition);
             algCompleted = true;
         }
         // stop if not unique
         else if (bucket[traverserHashLocation] == inputData)
+        {
             algCompleted = true;
+            cout << endl << "Op failed: Key already in bucket." << endl;
+        }
         // else continue circular searching 
         else if (traverserHashLocation < bucketSize - 1)
+        {
             traverserHashLocation += 1;
+            bucketPosition++;
+        }
         else
-            traverserHashLocation = 0;
-
-        // only allow one pass
-        if (i == bucketSize - 1)
         {
             cout << endl << "Bucket is full" << endl;
-            break;
+            algCompleted = true;
         }
-        else i++;
     }
 }
 
@@ -150,6 +151,7 @@ void myBucket::bitOp(string oP, int bucketPosition, int dataPosition)
         hopBits[bucketPosition] = hopBits[bucketPosition] | dataPosition;
     else if (oP == "AND")
         hopBits[bucketPosition] = hopBits[bucketPosition] & dataPosition;
+    // SUB eq (negative bucket pos) * pos | ex pos 2 = 0100. neg pos(~) = 1011 => resets 2nd bit with AND op.
     else if (oP == "SUB")
         hopBits[bucketPosition] = hopBits[bucketPosition] & ~dataPosition;
 }
@@ -166,7 +168,7 @@ void myBucket::search(string& inputData, int hashLocation)
     }
     else
     {
-        for (int i = 0; i < bucketMaxDist - 1; i++)
+        for (int i = 0; i < bucketMaxDist; i++)
         {
             if (inputData == bucket[hashLocation + i])
             {
@@ -192,7 +194,7 @@ void myBucket::remove(string& inputData, int hashLocation)
     }
     else
     {
-        for (int i = 0; i < bucketMaxDist - 1; i++)
+        for (int i = 0; i < bucketMaxDist; i++)
         {
             if (inputData == bucket[hashLocation + i])
             {
