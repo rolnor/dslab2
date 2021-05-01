@@ -23,8 +23,8 @@ public:
     myBucket();
     void insert(string& inputData, int hashLocation);
     void bitOp(string oP, int bucketPosition, int dataPosition);
-//    void search(string& inputData, int hashLocation);
-//    void remove(string& inputData, int hashLocation);
+    void search(string& inputData, int hashLocation);
+    void remove(string& inputData, int hashLocation);
 //    void repartition(int trueHash, int newHashLocation);
     int calculateHash(const string& key, int bucketSize);
     void print();
@@ -47,14 +47,14 @@ int main()
             hopBucket.insert(inputString, hopBucket.calculateHash(inputString, bucketSize));
             break;
         case '2':
- //           cout << endl << "Search: ";
- //           getLine(inputString);
-  //          linearTable.search(inputString, linearTable.calculateHash(inputString, tableSize));
+            cout << endl << "Search: ";
+            getLine(inputString);
+            hopBucket.search(inputString, hopBucket.calculateHash(inputString, bucketSize));
               break;
         case '3':
-      //      cout << endl << "Remove: ";
-        //    getLine(inputString);
-          //  linearTable.remove(inputString, linearTable.calculateHash(inputString, tableSize));
+            cout << endl << "Remove: ";
+            getLine(inputString);
+            hopBucket.remove(inputString, hopBucket.calculateHash(inputString, bucketSize));
               break;
         case '4':
               hopBucket.print();
@@ -133,7 +133,7 @@ void myBucket::bitOp(string oP, int bucketPosition, int dataPosition)
     // 1000 = 0 pos = 1
     // 0100 = 1 pos = 2 
     // 0010 = 2 pos = 4
-    // 0001 = 4 pos = 9
+    // 0001 = 4 pos = 8
 
     if (dataPosition == 0)
         dataPosition = 1;
@@ -141,7 +141,7 @@ void myBucket::bitOp(string oP, int bucketPosition, int dataPosition)
         dataPosition = 2;
     else if (dataPosition == 2)
         dataPosition = 4;
-    else if (dataPosition == 2)
+    else if (dataPosition == 3)
         dataPosition = 8;
     else
         dataPosition = 0;
@@ -150,65 +150,64 @@ void myBucket::bitOp(string oP, int bucketPosition, int dataPosition)
         hopBits[bucketPosition] = hopBits[bucketPosition] | dataPosition;
     else if (oP == "AND")
         hopBits[bucketPosition] = hopBits[bucketPosition] & dataPosition;
+    else if (oP == "SUB")
+        hopBits[bucketPosition] = hopBits[bucketPosition] & ~dataPosition;
 }
 
-//void myBucket::search(string& inputData, int hashLocation)
-//{
-//    bool algCompleted = false;
-//    int i = 0;
-//
-//    while (!algCompleted)
-//    {
-//        if (data[hashLocation] == "")
-//        {
-//            cout << endl << "Key not found" << endl;
-//            algCompleted = true;
-//        }
-//        else if (data[hashLocation] == inputData)
-//        {
-//            cout << endl << "Key found" << endl;
-//            algCompleted = true;
-//        }
-//        else if (hashLocation < tableSize - 1)
-//            hashLocation += 1;
-//        else
-//            hashLocation = 0;
-//
-//        // only allow one pass
-//        if (i == tableSize - 1)
-//        {
-//            cout << endl << "Key not found" << endl;
-//            break;
-//        }
-//        else i++;
-//    }
-//}
-//
-//void myBucket::remove(string& inputData, int hashLocation)
-//{
-//    bool algCompleted = false;
-//    int traverser = hashLocation;
-//
-//    int i = 0;
-//
-//    while (!algCompleted && i < tableSize - 1)
-//    {
-//        if (data[traverser] == "")
-//        {
-//            algCompleted = true;
-//        }
-//        else if (data[traverser] == inputData)
-//        {
-//            data[traverser] = "";
-//            repartition(hashLocation, traverser);
-//        }
-//        else if (traverser < tableSize - 1)
-//            traverser += 1;
-//        else
-//            traverser = 0;
-//    }
-//}
-//
+void myBucket::search(string& inputData, int hashLocation)
+{
+    unsigned int BitIndex = hopBits[hashLocation];
+    unsigned int shiftBits = 1;
+    bool keyFound = false;
+
+    if (BitIndex == 0)
+    {
+        cout << endl << "Key not found" << endl;
+    }
+    else
+    {
+        for (int i = 0; i < bucketMaxDist - 1; i++)
+        {
+            if (inputData == bucket[hashLocation + i])
+            {
+                cout << endl << "Key found" << endl;
+                keyFound = true;
+            }
+
+        }
+        if (!keyFound)
+            cout << endl << "Key not in bucket" << endl;
+    }
+}
+
+void myBucket::remove(string& inputData, int hashLocation)
+{
+    unsigned int BitIndex = hopBits[hashLocation];
+    unsigned int shiftBits = 1;
+    bool keyFound = false;
+
+    if (BitIndex == 0)
+    {
+        cout << endl << "Key not found" << endl;
+    }
+    else
+    {
+        for (int i = 0; i < bucketMaxDist - 1; i++)
+        {
+            if (inputData == bucket[hashLocation + i])
+            {
+                cout << endl << "Key found and removed" << endl;
+                keyFound = true;
+
+                bucket[hashLocation + i] = "";
+                bitOp("SUB", hashLocation, i);
+            }
+        }
+        if (!keyFound)
+            cout << endl << "Key not in bucket" << endl;
+    }
+}
+
 //void myBucket::repartition(int trueHash, int newHashLocation)
 //{
 //    bool algCompleted = false;
