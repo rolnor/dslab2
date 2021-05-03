@@ -35,6 +35,7 @@ public:
     bool repartition(int trueHash);
     // calculates hash index of specified key
     int calculateHash(const string& key, int bucketSize);
+    void insertData();
     void print();
 };
 
@@ -68,7 +69,7 @@ int main()
             hopBucket.print();
             break;
         case '5':
-            hopBucket.repartition(5);
+            hopBucket.insertData();
             break;
         case '0':
             break;
@@ -83,6 +84,7 @@ void menu()
     cout << "2. Search" << endl;
     cout << "3. Remove" << endl;
     cout << "4. Print" << endl;
+    cout << "5. Insert data" << endl;
     cout << "0. Quit " << endl;
 }
 
@@ -127,7 +129,7 @@ void myBucket::insert(string& inputData, int hashLocation)
             cout << endl << "Op failed: Key already in bucket." << endl;
         }
         // else continue circular searching 
-        else if (traverserHashLocation < bucketSize - 1)
+        else if (traverserHashLocation < bucketMaxDist)
         {
             traverserHashLocation += 1;
             bucketPosition++;
@@ -138,9 +140,10 @@ void myBucket::insert(string& inputData, int hashLocation)
             // 
             // TODO call repartition here
             // might be done???! 
-            if (repartition(traverserHashLocation))
+            if (repartition(hashLocation))
             {
-                traverserHashLocation = 0;
+                traverserHashLocation = hashLocation;
+                bucketPosition = 0;
             }
             else
             {
@@ -263,7 +266,10 @@ bool myBucket::repartition(int trueHash)
             currentIndex = searchIndex.back();
             searchIndex.pop_back();
             // check hash of that entry
-            itemHomeHash = calculateHash(bucket[trueHash + currentIndex], bucketSize);
+            if(trueHash + currentIndex < bucketSize)
+                itemHomeHash = calculateHash(bucket[trueHash + currentIndex], bucketSize);
+            else 
+                itemHomeHash = calculateHash(bucket[(trueHash + currentIndex)-bucketSize], bucketSize);
             // check bits of that hash index. any free slots?
             if (hopBits[itemHomeHash] < 15)
             {
@@ -272,11 +278,12 @@ bool myBucket::repartition(int trueHash)
                 searchIndex = calculateBitLocation(hopBits[itemHomeHash]);
                 moveToIndex = itemHomeHash + searchIndex.back();
   
+                // move item in other bucket index
                 bucket[moveToIndex] = bucket[trueHash + currentIndex];
-                bitOp("ADD", itemHomeHash, currentIndex);
-
+                bitOp("SUB", itemHomeHash, moveToIndex-currentIndex);
+                // empty bucket and update index bits
                 bucket[trueHash + currentIndex] = "";
-                bitOp("SUB", trueHash, currentIndex);
+                bitOp("OR", itemHomeHash, currentIndex);
                 succededMove = true;
             }
         }
@@ -291,9 +298,21 @@ int myBucket::calculateHash(const string& key, int tableSize)
 
     for (char myChar : key)
     {
-        hashValue = 4;//37 * hashValue + myChar;
+        hashValue = myChar;//4;//37 * hashValue + myChar;
     }
     return hashValue % tableSize;
+}
+
+void myBucket::insertData()
+{
+    bucket[1] = "a";
+    hopBits[1] = 1;
+    bucket[2] = "b";
+    hopBits[2] = 7;
+    bucket[3] = "bb";
+    hopBits[3] = 0;
+    bucket[4] = "bbb";
+    hopBits[4] = 0;
 }
 
 void myBucket::print()
