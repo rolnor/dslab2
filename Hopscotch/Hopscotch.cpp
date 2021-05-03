@@ -12,6 +12,7 @@ void menu();
 
 // global variables
 const int bucketSize = 8;
+// hardcoded.... don't change max dist! WILL destroy bit calculation.
 const int bucketMaxDist = 4;
 
 class myBucket
@@ -25,7 +26,7 @@ public:
     void insert(string& inputData, int hashLocation);
     // update bit operations. supports ADD, OR and SUB
     void bitOp(string oP, int bucketPosition, int dataPosition);
-    // calculates index list from bits
+    // calculates relative index postition list from bits
     vector<int> calculateBitLocation(int bitString);
     // search for input key in the specified hashlocation
     void search(string& inputData, int hashLocation);
@@ -137,16 +138,16 @@ void myBucket::insert(string& inputData, int hashLocation)
         else
         {
             cout << endl << "Bucket is full. Trying to restructure" << endl;
-            // 
-            // TODO call repartition here
-            // might be done???! 
+
             if (repartition(hashLocation))
             {
+                cout << endl << "Restructure successful. Adding key." << endl;
                 traverserHashLocation = hashLocation;
                 bucketPosition = 0;
             }
             else
             {
+                cout << endl << "Restructure failed. Key not added." << endl;
                 algCompleted = true;
             }
         }
@@ -278,7 +279,7 @@ bool myBucket::repartition(int trueHash)
                 searchIndex = calculateBitLocation(hopBits[itemHomeHash]);
                 moveToIndex = itemHomeHash + searchIndex.back();
   
-                // move item in other bucket index
+                // move item in other free bucket
                 bucket[moveToIndex] = bucket[trueHash + currentIndex];
                 bitOp("SUB", itemHomeHash, moveToIndex-currentIndex);
                 // empty bucket and update index bits
