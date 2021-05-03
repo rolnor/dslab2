@@ -17,12 +17,16 @@ class myTable
 {
 private:
     string data[tableSize];
+    int collisions;
 public:
+    myTable() { collisions = 0;};
     void insert(string& inputData,int hashLocation);
     void search(string& inputData, int hashLocation);
     void remove(string& inputData, int hashLocation);
     void repartition(int trueHash, int newHashLocation);
     int calculateHash(const string& key, int tableSize);
+    void incCollisions();
+    int getCollisions() { return collisions; };
     void print();
 };
 
@@ -33,6 +37,7 @@ int main()
     string inputString = "";
     while (choise != '0')
     {
+        cout << endl << endl << "Collisions: " << to_string(linearTable.getCollisions()) << endl << endl;
         menu();
         cin >> choise;
         switch (choise)
@@ -96,9 +101,16 @@ void myTable::insert(string& inputData, int hashLocation)
             algCompleted = true;
         // else continue circular searching 
         else if (hashLocation < tableSize - 1)
+        {
             hashLocation += 1;
+            incCollisions();
+        }
         else
+        {
             hashLocation = 0;
+            incCollisions();
+        }
+
 
         // only allow one pass
         if (i == tableSize - 1)
@@ -166,30 +178,34 @@ void myTable::remove(string& inputData, int hashLocation)
     }
 }
 
+// new hashlocation is empty
 void myTable::repartition(int trueHash, int newHashLocation)
 {
     bool algCompleted = false;
-    int trailingHashLocation;
-    int i = 0;
+  //  int trailingHashLocation;
+    int openSlot = newHashLocation;
+    int i = 0,y;
 
     while(!algCompleted)
     {
-        if (newHashLocation + 1 < tableSize - 1)
+        if (newHashLocation + 1 < tableSize)
             newHashLocation++;
         else newHashLocation = 0;
 
-        if (newHashLocation == 0)
-            trailingHashLocation = tableSize - 1;
-        else trailingHashLocation = newHashLocation-1;
-
-        // move data up one slot
         if (trueHash == calculateHash(data[newHashLocation], tableSize))
         {
-            data[trailingHashLocation] = data[newHashLocation];
+            data[openSlot] = data[newHashLocation];
             data[newHashLocation] = "";
+            openSlot = newHashLocation;
+        }
+        else if((data[newHashLocation] != "") && openSlot >= calculateHash(data[newHashLocation], tableSize))
+        {
+            data[openSlot] = data[newHashLocation];
+            data[newHashLocation] = "";
+            openSlot = newHashLocation;
         }
         // stop if empty slot or correct hash
-        else if(newHashLocation == calculateHash(data[newHashLocation], tableSize) || data[newHashLocation] == "")
+        else if(data[newHashLocation] == "")
             algCompleted = true;
     }
 }
@@ -201,9 +217,14 @@ int myTable::calculateHash(const string& key, int tableSize)
 
     for (char myChar : key)
     {
-        hashValue = 9;//37 * hashValue + myChar;
+        hashValue = myChar;//9;//37 * hashValue + myChar;
     }
     return hashValue % tableSize;
+}
+
+void myTable::incCollisions()
+{
+    collisions++;
 }
 
 void myTable::print()
