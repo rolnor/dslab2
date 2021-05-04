@@ -3,6 +3,13 @@
 #include <string>
 
 
+//1. running time
+//2. different load factors
+//3. different hashing functions
+//4. the number of probes during insertions
+//5. the number of insertions that encountered a collision
+//6. the length of the longest collision chain
+
 
 using namespace std;
 
@@ -11,7 +18,7 @@ void getLine(string& inputString);
 void menu();
 
 // global variables
-const int bucketSize = 8;
+const int bucketSize = 12;
 // hardcoded.... don't change max dist! WILL destroy bit calculation.
 const int bucketMaxDist = 4;
 
@@ -20,6 +27,7 @@ class myBucket
 private:
     string bucket[bucketSize];
     unsigned char hopBits[bucketSize];
+    int collisions;
 public:
     myBucket();
     // inserts data into bucket
@@ -38,6 +46,8 @@ public:
     int calculateHash(const string& key, int bucketSize);
     void insertData();
     void print();
+    void incCollisions() { collisions++; };
+    int getCollisions() { return collisions; };
 };
 
 int main()
@@ -47,6 +57,7 @@ int main()
     string inputString = "";
     while (choise != '0')
     {
+        cout << endl << endl << "Hop Collisions: " << to_string(hopBucket.getCollisions()) << endl << endl;
         menu();
         cin >> choise;
         switch (choise)
@@ -103,6 +114,7 @@ myBucket::myBucket()
     {
         hopBits[i] = 0;
     }
+    collisions = 0;
 }
 
 void myBucket::insert(string& inputData, int hashLocation)
@@ -134,6 +146,7 @@ void myBucket::insert(string& inputData, int hashLocation)
         {
             traverserHashLocation += 1;
             bucketPosition++;
+            incCollisions();
         }
         else
         {
