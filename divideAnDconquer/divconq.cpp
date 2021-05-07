@@ -7,6 +7,7 @@ using namespace std;
 
 int calculateMedian(vector<int> mySubList);
 int partition(vector<int>& elements, int left, int right, int pivotPoint);
+void divideArray(vector<int>& elements, int pivotPosition, bool keepLeftOfPivot);
 
 void quickSelect(vector<int>& elements, int left, int right, int searchedElement);
 
@@ -58,13 +59,32 @@ int main()
     //partition the list with calculated pivot point
     pivotPoint = partition(elements, elements.back(), elements.front(), pivotPoint);
 
-    
+    divideArray(elements, pivotPoint, false);
 
 
 
     delete[] medianArray;
     return 0;
 }
+void divideArray(vector<int>& elements, int pivotPosition, bool keepLeftOfPivot)
+{
+    vector<int> temp;
+    if (keepLeftOfPivot)
+    {
+        for (int i = 0; i < pivotPosition; i++)
+        {
+            temp.push_back(elements[i]);
+        }
+    }
+    else
+    {
+        pivotPosition++;
+        for(pivotPosition; pivotPosition < elements.size(); pivotPosition++)
+            temp.push_back(elements[pivotPosition]);
+    }
+    elements = temp;
+}
+
 
 
 int calculateMedian(vector<int> mySubList)
