@@ -8,13 +8,12 @@ using namespace std;
 int calculateMedian(vector<int> mySubList);
 int partition(vector<int>& elements, int left, int right, int pivotPoint);
 void divideArray(vector<int>& elements, int pivotPosition, bool keepLeftOfPivot);
-void insertionSort(vector<int>& elements);
-int lomutoPartition(vector<int>& arr, int low, int high);
-int kthSmallest(vector<int>& arr, int n, int k);
+void mySort(vector<int>& elements);
+
 
 int main()
 {
-    vector<int> elements = { 2, 4, 12, 10, 17, 22, 8, 13, 7, 19,22,1 ,42,43,32,23,25,67};
+    vector<int> elements = { 2, 4, 12, 10, 17, 22, 8, 13, 7, 19,22,1 ,42,43,32,23,25,67,100,78,56,33};
 
     int pivotPos = 0;
     int wantedLargestNumber = 4;
@@ -81,7 +80,7 @@ int main()
     // need linear sorting here. insertion wrong?
     
    // kthSmallest(elements,0,5);
-    insertionSort(elements);
+    mySort(elements);
     cout << "The " << to_string(wantedLargestNumber) << ":th smallest number is " << elements[3] << endl << endl;
     // 2. add recurive function calls
     // 3. done!!!
@@ -153,36 +152,8 @@ int partition(vector<int>& elements, int left, int right, int pivotPoint)
     return j;
 }
 
-int lomutoPartition(vector<int>& arr, int low, int high) {
-    int pivot = arr[high];
-    int index = low;
-    for (int j = low; j <= high; j++) {
-        if (arr[j] < pivot) {
-            index++;
-            swap(arr[index], arr[j]);
-        }
-    }
-    swap(arr[index + 1], arr[high]);
-    return index + 1;
-}
 
-int kthSmallest(vector<int>& arr, int n, int k) {
-
-    int low = 0, high = n - 1;
-    while (low <= high) {
-        int pivot = lomutoPartition(arr, low, high);
-        if (pivot == k - 1)
-            return pivot;
-        else if (pivot > k - 1)
-            high = pivot - 1;
-        else
-            low = pivot + 1;
-    }
-    return -1;
-}
-
-
-void insertionSort(vector<int>& elements)
+void mySort(vector<int>& elements)
 {
     int pivotPoint, j;
     for (int i = 0; i < elements.size(); i++) 
