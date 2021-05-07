@@ -11,6 +11,16 @@ void divideArray(vector<int>& elements, int pivotPosition, bool keepLeftOfPivot)
 void mySort(vector<int>& elements);
 
 
+// steps:
+
+// 1. Create list 
+//
+//
+//
+//
+
+
+
 int main()
 {
     vector<int> elements = { 2, 4, 12, 10, 17, 22, 8, 13, 7, 19,22,1 ,42,43,32,23,25,67,100,78,56,33};
