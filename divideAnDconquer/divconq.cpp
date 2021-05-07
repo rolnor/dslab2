@@ -6,7 +6,8 @@ using namespace std;
 
 
 int calculateMedian(vector<int> mySubList);
-void partition(vector<int>& elements, int left, int right, int pivotPoint);
+int partition(vector<int>& elements, int left, int right, int pivotPoint);
+
 void quickSelect(vector<int>& elements, int left, int right, int searchedElement);
 
 
@@ -14,6 +15,9 @@ void quickSelect(vector<int>& elements, int left, int right, int searchedElement
 int main()
 {
     vector<int> elements = { 2, 4, 12, 6, 17, 22, 5, 13, 7, 19 };
+
+    int pivotPos = 0;
+    int wantedLargestNumber = 4;
 
     int numberOfArrays = elements.size() / 5;
     // create room for segmented list. rows = elements/5 & columns = 5
@@ -50,14 +54,18 @@ int main()
     }
     pivotPoint = pivotPoint / numberOfArrays;
 
-  //  median(elements, elements.front(), elements.back());
+
     //partition the list with calculated pivot point
-    partition(elements, elements.back(), elements.front(), pivotPoint);
+    pivotPoint = partition(elements, elements.back(), elements.front(), pivotPoint);
+
+    
+
 
 
     delete[] medianArray;
     return 0;
 }
+
 
 int calculateMedian(vector<int> mySubList)
 {
@@ -70,7 +78,7 @@ int calculateMedian(vector<int> mySubList)
 }
 
 
-void partition(vector<int>& elements, int left, int right, int pivotPoint)
+int partition(vector<int>& elements, int left, int right, int pivotPoint)
 {
     elements.push_back(pivotPoint);
     int i = 0, j = elements.size()-2;
@@ -89,8 +97,10 @@ void partition(vector<int>& elements, int left, int right, int pivotPoint)
             swap(elements[i],elements[j]);
 
     }
+    // swap the pivotPoint as a seperator
     swap(elements[j], elements[elements.size()-1]);
 
+    return j;
 }
 
 // median-of-median-of-five partitioning
