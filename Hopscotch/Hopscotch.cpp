@@ -18,7 +18,7 @@ void getLine(string& inputString);
 void menu();
 
 // global variables
-const int bucketSize = 12;
+const int bucketSize = 8;
 // hardcoded.... don't change max dist! WILL destroy bit calculation.
 const int bucketMaxDist = 4;
 
@@ -312,7 +312,7 @@ int myBucket::calculateHash(const string& key, int tableSize)
 
     for (char myChar : key)
     {
-        hashValue = myChar;//4;//37 * hashValue + myChar;
+        hashValue = myChar;//37 * hashValue + myChar;
     }
     return hashValue % tableSize;
 }
