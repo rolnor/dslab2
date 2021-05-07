@@ -59,10 +59,16 @@ int main()
     //partition the list with calculated pivot point
     pivotPoint = partition(elements, elements.back(), elements.front(), pivotPoint);
 
-    divideArray(elements, pivotPoint, false);
+    // decide which part to keep after divide
+    if(wantedLargestNumber < pivotPoint)
+        divideArray(elements, pivotPoint, true);
 
-
-
+    // [TODO] 
+    // 1. sort the final array
+    // 2. add recurive function calls
+    // 3. done!!!
+    
+    // free up allocated memory
     delete[] medianArray;
     return 0;
 }
