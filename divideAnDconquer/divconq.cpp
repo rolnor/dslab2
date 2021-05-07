@@ -13,11 +13,13 @@ void mySort(vector<int>& elements);
 
 // steps:
 
-// 1. Create list 
-//
-//
-//
-//
+// 1. Create sublist with 5 elements each
+// 2. calculate median for each sublist 
+// 3. calculate total median. this is our pivotpoint
+// 4. partition the list with the generated pivot point and take note of the pivotpoints position
+// 5. divide at the pivotpoint and keep the smaller until we reach our target size. 
+// 6. sort the remaining small list
+// 7. the 4:th smallest is now in the 4:th pos of the list.
 
 
 
@@ -84,18 +86,8 @@ int main()
         delete[] medianArray;
         numberOfArrays = ceil(elements.size() / 5.0);
     }
-
-    // [TODO] 
-    // 1. sort the final array
-    // need linear sorting here. insertion wrong?
-    
-   // kthSmallest(elements,0,5);
     mySort(elements);
     cout << "The " << to_string(wantedLargestNumber) << ":th smallest number is " << elements[3] << endl << endl;
-    // 2. add recurive function calls
-    // 3. done!!!
-    
-    // free up allocated memory
 
     return 0;
 }
