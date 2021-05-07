@@ -154,7 +154,6 @@ int partition(vector<int>& elements, int left, int right, int pivotPoint)
     return j;
 }
 
-
 void mySort(vector<int>& elements)
 {
     int pivotPoint, j;
