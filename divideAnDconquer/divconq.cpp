@@ -8,6 +8,7 @@ using namespace std;
 int calculateMedian(vector<int> mySubList);
 int partition(vector<int>& elements, int left, int right, int pivotPoint);
 void divideArray(vector<int>& elements, int pivotPosition, bool keepLeftOfPivot);
+void insertionSort(vector<int>& elements);
 
 void quickSelect(vector<int>& elements, int left, int right, int searchedElement);
 
@@ -65,6 +66,9 @@ int main()
 
     // [TODO] 
     // 1. sort the final array
+    // need linear sorting here. insertion wrong?
+    insertionSort(elements);
+    cout << "The " << to_string(wantedLargestNumber) << ":th largest number is " << elements[3] << endl << endl;
     // 2. add recurive function calls
     // 3. done!!!
     
@@ -127,6 +131,22 @@ int partition(vector<int>& elements, int left, int right, int pivotPoint)
     swap(elements[j], elements[elements.size()-1]);
 
     return j;
+}
+
+
+void insertionSort(vector<int>& elements)
+{
+    int key, j;
+    for (int i = 0; i < elements.size(); i++) 
+    {
+        key = elements[i];
+        j = i;
+        while (j > 0 && elements[j - 1] > key) {
+            elements[j] = elements[j - 1];
+            j--;
+        }
+        elements[j] = key;   
+    }
 }
 
 // median-of-median-of-five partitioning
